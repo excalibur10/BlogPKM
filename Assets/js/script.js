@@ -25,8 +25,10 @@ $(document).ready(function() {
             'bottom': taskbarPos
         });
     }
-    //update
-    setInterval(displayTaskbar, 1000);
+    // Call once on page load
+    displayTaskbar();
+    // Update on window resize
+    $(window).resize(displayTaskbar);
 
     function showLap() {
         $('.image-gallery').click(function() {
@@ -36,17 +38,6 @@ $(document).ready(function() {
         });
     }
     showLap();
-
-    function loadPage() {
-        $("#lab3").load("lab/lab3.html");
-        $("#lab4").load("lab/lab4.html");
-        $("#lab5").load("lab/lab5.html");
-        $("#lab6").load("lab/lab6.html");
-        $("#lab7").load("lab/lab7.html");
-        $("#lab8").load("lab/lab8.html");
-        $("#lab9").load("lab/lab9.html");
-    }
-    loadPage();
 
     function showMenu() {
         $('.window').hover(function() {
