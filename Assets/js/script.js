@@ -1,95 +1,138 @@
-//ready function
-$(document).ready(function() {
+//vanilla JS implementation
+document.addEventListener('DOMContentLoaded', function() {
+    function readCssVar(name, fallback) {
+        var value = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+        return value || fallback;
+    }
     //height of browser
     var height = window.innerHeight ||
         document.documentElement.clientHeight ||
         document.body.clientHeight;
     //set height of laptop background according to height of browser
-    $("#wrapper").css({
-        'height': height,
-        'max-height': height
-    });
+    var wrapper = document.getElementById('wrapper');
+    wrapper.style.height = height + 'px';
+    wrapper.style.maxHeight = height + 'px';
 
     function displayTaskbar() {
-        var widthScreen = $("#screen").width();
-        var footerHeight = $('#footer').height()
+        var screen = document.getElementById('screen');
+        var widthScreen = screen.offsetWidth;
+        var footer = document.getElementById('footer');
+        var footerHeight = footer.offsetHeight;
 
-        var bottomHeight = $('.bottom').height();
+        var bottom = document.querySelector('.bottom');
+        var bottomHeight = bottom.offsetHeight;
         var taskbarPos = footerHeight + bottomHeight;
-        $('.bottom').css({
-            'width': widthScreen,
-            'bottom': footerHeight
-        });
-        $('.taskbar').css({
-            'width': widthScreen,
-            'bottom': taskbarPos
-        });
+
+        bottom.style.width = widthScreen + 'px';
+        bottom.style.bottom = footerHeight + 'px';
+
+        var taskbar = document.querySelector('.taskbar');
+        taskbar.style.width = widthScreen + 'px';
+        taskbar.style.bottom = taskbarPos + 'px';
     }
     // Call once on page load
     displayTaskbar();
     // Update on window resize
-    $(window).resize(displayTaskbar);
+    window.addEventListener('resize', displayTaskbar);
 
     function showLap() {
-        $('.image-gallery').click(function() {
-            $('#main-container').hide(function() {
-                $("#skill").show();
-            });
+        var imageGallery = document.querySelector('.image-gallery');
+        imageGallery.addEventListener('click', function() {
+            var mainContainer = document.getElementById('main-container');
+            mainContainer.style.display = 'none';
+            // Use setTimeout to mimic jQuery's callback after hide
+            setTimeout(function() {
+                var skill = document.getElementById('skill');
+                skill.style.display = 'block';
+            }, 0);
         });
     }
     showLap();
 
     function showMenu() {
-        $('.window').hover(function() {
-                $('#vertical-nav').show();
-                $('#screen').css('z-index', 6);
+        var windowElement = document.querySelector('.window');
+        var verticalNav = document.getElementById('vertical-nav');
+        var screen = document.getElementById('screen');
 
-            },
-            function() {
-                $('#screen').css('z-index', 1);
-                if ($('#vertical-nav:hover').length === 0) {
-                    $('#vertical-nav').hide();
-                } else {
-                    $('#vertical-nav').mouseleave(function() {
-                        $(this).hide();
-                    });
-                }
-            });
+        windowElement.addEventListener('mouseenter', function() {
+            verticalNav.style.display = 'block';
+            screen.style.zIndex = '6';
+        });
+
+        windowElement.addEventListener('mouseleave', function() {
+            screen.style.zIndex = '1';
+            // Check if mouse is over vertical-nav
+            if (!verticalNav.matches(':hover')) {
+                verticalNav.style.display = 'none';
+            }
+        });
+
+        verticalNav.addEventListener('mouseleave', function() {
+            this.style.display = 'none';
+        });
     }
     showMenu();
 
-    function openModal(buttonClick, modal, iconClass, color) {
-        $(buttonClick).click(function() {
-            showModal(modal);
-            $('#taskbar > ul').append('<li class="usericon"><span class="fa ' + iconClass + '"></span></a></li>');
-            $('.usericon').css('background-color',color);
-        });
-        // close modal
-        $(".close").click(function() {
-            closeModal(modal);
-            $("#taskbar ul li").remove(".usericon");
-        });
-    }
     function showModal(modal) {
-        modal.show();
+        modal.style.display = 'block';
     }
 
-    function closeModal(modal, container) {
-        modal.hide();
+    function closeModal(modal) {
+        modal.style.display = 'none';
+    }
+
+    function openModal(buttonClick, modal, iconClass, color) {
+        buttonClick.addEventListener('click', function() {
+            showModal(modal);
+
+            // Create and append the usericon
+            var taskbarUl = document.querySelector('#taskbar > ul');
+            var li = document.createElement('li');
+            li.className = 'usericon';
+            li.innerHTML = '<span class="fa ' + iconClass + '"></span>';
+            taskbarUl.appendChild(li);
+
+            // Set background color
+            var userIcons = document.querySelectorAll('.usericon');
+            userIcons.forEach(function(icon) {
+                icon.style.backgroundColor = color;
+            });
+        });
+
+        // Close modal
+        var closeButtons = modal.querySelectorAll('.close');
+        closeButtons.forEach(function(closeBtn) {
+            closeBtn.addEventListener('click', function() {
+                closeModal(modal);
+
+                // Remove usericon
+                var userIcons = document.querySelectorAll('#taskbar ul li.usericon');
+                userIcons.forEach(function(icon) {
+                    icon.parentNode.removeChild(icon);
+                });
+            });
+        });
     }
 
     function openUser() {
-        openModal($('.user'), $("#modalUser"), "fa-user","#5BB2FC");
+        var userButton = document.querySelector('.user');
+        var modalUser = document.getElementById('modalUser');
+        openModal(userButton, modalUser, "fa-user", readCssVar('--taskbar-icon-user', '#5BB2FC'));
     }
 
-    function openLove(){
-        openModal($(".love"), $("#modalLove"), "fa-heart","#FF7A85");
+    function openLove() {
+        var loveButton = document.querySelector('.love');
+        var modalLove = document.getElementById('modalLove');
+        openModal(loveButton, modalLove, "fa-heart", readCssVar('--taskbar-icon-love', '#FF7A85'));
     }
 
     function openContact() {
-        openModal($(".contact"), $("#modalContact"), "fa-phone", "#58EBD3");
+        var contactButton = document.querySelector('.contact');
+        var modalContact = document.getElementById('modalContact');
+        openModal(contactButton, modalContact, "fa-phone", readCssVar('--taskbar-icon-contact', '#58EBD3'));
     }
+
     openUser();
     openLove();
     openContact();
-})
+});

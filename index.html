@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -7,17 +7,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Ginny Nguyen's Portfolio - Software Developer">
     <link rel="icon" type="image/icon" href="./Assets/img/icon.png">
+    <script src="./Assets/js/theme.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;1,9..40,400&family=Inter:wght@400;600&family=Lora:ital,wght@0,400;0,600;1,400&family=Outfit:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="./Assets/css/style.css">
-    <link rel="stylesheet" type="text/css" href="./Assets/css/responsive.css">
-    <link rel="stylesheet" type="text/css" href="./Assets/font-awesome/css/all.min.css">
-    <script type="text/javascript" src="./Assets/js/jquery-3.1.0.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./Assets/font-awesome/css/all.css">
     <script type="text/javascript" src="./Assets/js/mouse.js"></script>
-    <style type="text/css">
-        body,
-        a:hover {
-            cursor: pointer;
-        }
-    </style>
 </head>
 
 <body>
@@ -133,37 +129,53 @@
 
 
     <script>
-        $(function () {
-            $('.formConfession').submit(function (e) {
-                e.preventDefault();
-                var message = $("#message").val();
-                $('#loading-image').show();
-                $.ajax({
-                    url: '@Url.Action("SendConfess", "Ahihi")',
-                    type: "GET",
-                    cache: false,
-                    data: {
-                        message: message
-                    },
-                    success: function (data) {
-                        if (data == "null") {
-                            alert("Viết gì đi ^^");
-                        } else {
-                            alert("Cảm ơn bạn đã phản hồi ^^");
-                            $("#modalLove").hide();
-                            $("#taskbar ul li").remove(".usericon");
-                            $("#message").val('');
-                        }
+        // Replaced jQuery with vanilla JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            var formConfession = document.querySelector('.formConfession');
+            if (formConfession) {
+                formConfession.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    var message = document.getElementById('message').value;
+                    var loadingImage = document.getElementById('loading-image');
+                    loadingImage.style.display = 'block';
 
-                    },
-                    complete: function () {
-                        $('#loading-image').hide();
-                    },
-                    error: function (xhr) {
+                    // Create and send XMLHttpRequest
+                    var xhr = new XMLHttpRequest();
+                    xhr.open('GET', '@Url.Action("SendConfess", "Ahihi")?message=' + encodeURIComponent(message), true);
+                    xhr.setRequestHeader('Cache-Control', 'no-cache');
+
+                    xhr.onload = function() {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            var data = xhr.responseText;
+                            if (data == "null") {
+                                alert("Viết gì đi ^^");
+                            } else {
+                                alert("Cảm ơn bạn đã phản hồi ^^");
+                                var modalLove = document.getElementById('modalLove');
+                                modalLove.style.display = 'none';
+
+                                // Remove usericon
+                                var userIcons = document.querySelectorAll('#taskbar ul li.usericon');
+                                userIcons.forEach(function(icon) {
+                                    icon.parentNode.removeChild(icon);
+                                });
+
+                                document.getElementById('message').value = '';
+                            }
+                        }
+                    };
+
+                    xhr.onerror = function() {
                         console.log("error call ajax check email exist");
-                    }
+                    };
+
+                    xhr.onloadend = function() {
+                        loadingImage.style.display = 'none';
+                    };
+
+                    xhr.send();
                 });
-            });
+            }
         });
     </script>
 
